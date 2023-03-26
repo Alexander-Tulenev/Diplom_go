@@ -12,7 +12,7 @@ for event in bot.longpoll.listen():
         if request == 'начать поиск':
             creating_database()
             bot.find_user(user_id)
-            bot.write_msg(event.user_id, f'Привет, нашёл пару, нажми на кнопку "Вперёд"')
+            bot.write_msg(user_id, f'Привет, нашёл пару, нажми на кнопку "Вперёд"')
             bot.find_persons(user_id, offset)
         elif request == 'вперёд':
             for person in line:
@@ -20,4 +20,4 @@ for event in bot.longpoll.listen():
                 bot.find_persons(user_id, offset)
                 break
         else:
-            bot.write_msg(event.user_id, 'Нажмите ниже на кнопку <Начать поиск> или <Вперед>')
+            bot.write_msg(user_id, 'Нажмите ниже на кнопку <Начать поиск> или <Вперед>')
