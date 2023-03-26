@@ -165,69 +165,40 @@ class VKBot:
         except KeyError:
             self.write_msg(user_id, 'id фотографии получить не удалось')
 
-    def get_photo_1(self, user_id):
-        """Получение id 1-й фотографии"""
+    def get_photo_n(self, user_id, n):
+        """Получение id n-й фотографии"""
         list_photo_id = self.get_photos_id(user_id)
         count = 0
         for photo_id in list_photo_id:
             count += 1
-            if count == 1:
+            if count == n:
                 return photo_id[1]
 
-    def get_photo_2(self, user_id):
-        """Получение id 2-й фотографии"""
-        list_photo_id = self.get_photos_id(user_id)
-        count = 0
-        for photo_id in list_photo_id:
-            count += 1
-            if count == 2:
-                return photo_id[1]
-
-    def get_photo_3(self, user_id):
-        """Получение id 3-й фотографии"""
-        list_photo_id = self.get_photos_id(user_id)
-        count = 0
-        for photo_id in list_photo_id:
-            count += 1
-            if count == 3:
-                return photo_id[1]
-
-    def send_photo_1(self, user_id, message, offset):
-        """Отправка 1-й фотографии"""
+    def send_photo(self, user_id, message, offset, photo_number):
+        """Отправка n-й фотографии"""
+        photo_id = self.get_photo_n(person_id(offset), photo_number)
         self.vk.method('messages.send', {'user_id': user_id,
                                          'access_token': user_token,
                                          'message': message,
-                                         'attachment': f'photo{person_id(offset)}_{self.get_photo_1(person_id(offset))}',
-                                         'random_id': 0})
-
-    def send_photo_2(self, user_id, message, offset):
-        """Отправка 2-й фотографии"""
-        self.vk.method('messages.send', {'user_id': user_id,
-                                         'access_token': user_token,
-                                         'message': message,
-                                         'attachment': f'photo{person_id(offset)}_{self.get_photo_2(person_id(offset))}',
-                                         'random_id': 0})
-
-    def send_photo_3(self, user_id, message, offset):
-        """Отправка 3-й фотографии"""
-        self.vk.method('messages.send', {'user_id': user_id,
-                                         'access_token': user_token,
-                                         'message': message,
-                                         'attachment': f'photo{person_id(offset)}_{self.get_photo_3(person_id(offset))}',
+                                         'attachment': f'photo{person_id(offset)}_{photo_id}',
                                          'random_id': 0})
 
     def find_persons(self, user_id, offset):
         self.write_msg(user_id, found_person_info(offset))
         insert_data_seen_users(person_id(offset))
         self.get_photos_id(person_id(offset))
-        if self.get_photo_1(person_id(offset)) is not None:
-            self.send_photo_1(user_id, 'Фото номер 1', offset)
-        if self.get_photo_2(person_id(offset)) is not None:
-            self.send_photo_2(user_id, 'Фото номер 2', offset)
-        if self.get_photo_3(person_id(offset)) is not None:
-            self.send_photo_3(user_id, 'Фото номер 3', offset)
-        else:
-            self.write_msg(user_id, f'проблема с получением фотографий удовлетворяющих поиску по лайкам, или их нет')
+        for i in range(1, 4):
+            photo = self.get_photo_n(person_id(offset), i)
+            if photo is not None:
+                self.vk.method('messages.send', {'user_id': user_id,
+                                                 'access_token': user_token,
+                                                 'message': f'Фото номер {i}',
+                                                 'attachment': f'photo{person_id(offset)}_{photo}',
+                                                 'random_id': 0})
+            else:
+                self.write_msg(user_id,
+                               f'проблема с получением фотографий удовлетворяющих поиску по лайкам, или их нет')
+                break
 
 
 bot = VKBot()
