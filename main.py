@@ -34,7 +34,7 @@ class VKBot:
                     return 1
                 elif gender.get('sex') == 1:
                     return 2
-        except ApiError:
+        except KeyError:
             self.write_msg(user_id, 'Ошибка получения токена user_token')
 
     def get_age_low(self, user_id):
